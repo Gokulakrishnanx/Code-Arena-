@@ -523,6 +523,182 @@
                 display: none;
             }
         }
+
+        @media (max-width: 768px) {
+            .navbar {
+                padding: 0.8rem;
+                flex-direction: column;
+                gap: 0.8rem;
+                text-align: center;
+                position: fixed;
+                top: 0;
+                left: 0;
+                right: 0;
+                background: rgba(0, 0, 0, 0.8);
+                backdrop-filter: blur(10px);
+                z-index: 100;
+            }
+
+            .nav-links {
+                flex-direction: row;
+                justify-content: center;
+                gap: 1rem;
+                width: 100%;
+            }
+
+            .points-btn, .start-btn {
+                flex: 1;
+                max-width: 150px;
+                text-align: center;
+            }
+
+            .hero {
+                padding-top: 120px;
+            }
+
+            .hero-content {
+                padding: 0 1rem;
+            }
+
+            .sheet-container {
+                margin: 0 0.5rem;
+                padding: 0.5rem;
+                border-radius: 15px;
+            }
+
+            .sheet-table {
+                display: block;
+                overflow-x: auto;
+                -webkit-overflow-scrolling: touch;
+            }
+
+            .sheet-table th {
+                white-space: nowrap;
+                position: sticky;
+                top: 0;
+                z-index: 1;
+            }
+
+            .sheet-table td {
+                white-space: nowrap;
+            }
+
+            .round-modal-content {
+                margin: 1rem;
+                max-height: 90vh;
+                overflow-y: auto;
+            }
+
+            .round-btn {
+                padding: 1.2rem;
+                font-size: 0.95rem;
+            }
+
+            .footer {
+                padding: 2rem 0 1rem;
+            }
+
+            .footer-content {
+                padding: 0 1rem;
+            }
+
+            .social-links {
+                justify-content: center;
+                gap: 1.5rem;
+            }
+
+            .social-links a {
+                font-size: 1.4rem;
+            }
+        }
+
+        @media (max-width: 480px) {
+            .navbar {
+                padding: 0.6rem;
+            }
+
+            .nav-links {
+                flex-direction: column;
+                gap: 0.5rem;
+            }
+
+            .points-btn, .start-btn {
+                max-width: 100%;
+            }
+
+            .hero-content h1 {
+                font-size: 1.6rem;
+            }
+
+            .hero-content h2 {
+                font-size: 1.2rem;
+            }
+
+            .sheet-table th,
+            .sheet-table td {
+                font-size: 0.75rem;
+                padding: 0.5rem;
+            }
+
+            .sheet-table td:first-child {
+                padding-left: 1rem;
+            }
+
+            .sheet-table td:last-child {
+                padding-right: 1rem;
+            }
+
+            .round-modal-title {
+                font-size: 1.3rem;
+                margin-bottom: 1rem;
+            }
+
+            .round-btn {
+                padding: 1rem;
+                font-size: 0.9rem;
+            }
+
+            .footer-logo h1 {
+                font-size: 1.3rem;
+            }
+
+            .footer-description {
+                font-size: 0.85rem;
+            }
+
+            .footer-section h3 {
+                font-size: 1rem;
+            }
+
+            .footer-links a {
+                font-size: 0.85rem;
+            }
+
+            .contact-item {
+                font-size: 0.85rem;
+            }
+
+            .social-links a {
+                font-size: 1.2rem;
+            }
+
+            .footer-bottom p {
+                font-size: 0.75rem;
+            }
+        }
+
+        /* Add touch-friendly styles */
+        @media (hover: none) {
+            .round-btn:active,
+            .points-btn:active,
+            .start-btn:active {
+                transform: scale(0.98);
+            }
+
+            .sheet-table tr:active {
+                background: rgba(255, 255, 255, 0.1);
+            }
+        }
     </style>
 </head>
 <body>
