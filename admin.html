@@ -1,0 +1,1282 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Admin Dashboard</title>
+    <link rel="stylesheet" href="styles.css">
+    <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=SF+Pro+Display:wght@400;500;600;700&display=swap">
+    <style>
+        .admin-container {
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+        }
+
+        .admin-nav {
+            background: rgba(255, 255, 255, 0.05);
+            backdrop-filter: blur(10px);
+            padding: 1rem 2rem;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+        }
+
+        .nav-left {
+            display: flex;
+            align-items: center;
+        }
+
+        .back-home-btn {
+            background: rgba(255, 255, 255, 0.1);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            border-radius: 980px;
+            padding: 0.6rem 1.2rem;
+            color: #ffffff;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            font-size: 0.85rem;
+            text-decoration: none;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .back-home-btn:hover {
+            background: rgba(255, 255, 255, 0.2);
+            transform: translateY(-2px);
+        }
+
+        .back-home-btn i {
+            font-size: 0.9rem;
+        }
+
+        .admin-nav h1 {
+            color: #ffffff;
+            margin: 0;
+            font-size: 1.5rem;
+        }
+
+        .admin-nav .logout-btn {
+            background: rgba(255, 255, 255, 0.1);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            border-radius: 980px;
+            padding: 0.6rem 1.2rem;
+            color: #ffffff;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            font-size: 0.85rem;
+            text-decoration: none;
+        }
+
+        .admin-nav .logout-btn:hover {
+            background: rgba(255, 255, 255, 0.2);
+            transform: translateY(-2px);
+        }
+
+        .login-container {
+            flex: 1;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            padding: 2rem;
+        }
+
+        .login-form {
+            background: rgba(255, 255, 255, 0.1);
+            backdrop-filter: blur(10px);
+            padding: 2rem;
+            border-radius: 20px;
+            width: 100%;
+            max-width: 400px;
+            border: 1px solid rgba(255, 255, 255, 0.1);
+        }
+
+        .login-form h2 {
+            color: #ffffff;
+            margin-bottom: 1.5rem;
+            text-align: center;
+        }
+
+        .form-group {
+            margin-bottom: 1.5rem;
+        }
+
+        .form-group label {
+            display: block;
+            color: #ffffff;
+            margin-bottom: 0.5rem;
+        }
+
+        .form-group input {
+            width: 100%;
+            padding: 0.8rem;
+            background: rgba(255, 255, 255, 0.05);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            border-radius: 8px;
+            color: #ffffff;
+            font-size: 1rem;
+        }
+
+        .form-group input:focus {
+            outline: none;
+            border-color: rgba(255, 255, 255, 0.4);
+        }
+
+        .login-btn {
+            width: 100%;
+            padding: 0.8rem;
+            background: rgba(255, 255, 255, 0.1);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            border-radius: 980px;
+            color: #ffffff;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            font-size: 1rem;
+        }
+
+        .login-btn:hover {
+            background: rgba(255, 255, 255, 0.2);
+            transform: translateY(-2px);
+        }
+
+        .dashboard {
+            display: none;
+            padding: 2rem;
+            max-width: 1200px;
+            margin: 0 auto;
+            width: 100%;
+        }
+
+        .dashboard-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 2rem;
+        }
+
+        .dashboard-title {
+            color: #ffffff;
+            margin: 0;
+            font-size: 1.8rem;
+        }
+
+        .dashboard-stats {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 1.5rem;
+            margin-bottom: 2rem;
+        }
+
+        .stat-card {
+            background: rgba(255, 255, 255, 0.1);
+            backdrop-filter: blur(10px);
+            padding: 1.5rem;
+            border-radius: 20px;
+            border: 1px solid rgba(255, 255, 255, 0.1);
+        }
+
+        .stat-card h3 {
+            color: #ffffff;
+            margin: 0 0 0.5rem 0;
+            font-size: 1.1rem;
+        }
+
+        .stat-card p {
+            color: #86868b;
+            margin: 0;
+            font-size: 1.5rem;
+            font-weight: 600;
+        }
+
+        .dashboard-actions {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 1.5rem;
+        }
+
+        .action-card {
+            background: rgba(255, 255, 255, 0.1);
+            backdrop-filter: blur(10px);
+            padding: 1.5rem;
+            border-radius: 20px;
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .action-card:hover {
+            background: rgba(255, 255, 255, 0.15);
+            transform: translateY(-2px);
+        }
+
+        .action-card h3 {
+            color: #ffffff;
+            margin: 0 0 0.5rem 0;
+            font-size: 1.1rem;
+        }
+
+        .action-card p {
+            color: #86868b;
+            margin: 0;
+            font-size: 0.9rem;
+        }
+
+        @media (max-width: 768px) {
+            .dashboard-stats,
+            .dashboard-actions {
+                grid-template-columns: 1fr;
+            }
+        }
+
+        .points-management {
+            background: rgba(255, 255, 255, 0.1);
+            backdrop-filter: blur(10px);
+            padding: 1.5rem;
+            border-radius: 20px;
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            margin-top: 2rem;
+        }
+
+        .section-title {
+            color: #ffffff;
+            margin: 0 0 1.5rem 0;
+            font-size: 1.2rem;
+        }
+
+        .table-container {
+            overflow-x: auto;
+        }
+
+        .points-table {
+            width: 100%;
+            border-collapse: collapse;
+            background: rgba(255, 255, 255, 0.05);
+            border-radius: 10px;
+            overflow: hidden;
+        }
+
+        .points-table th,
+        .points-table td {
+            padding: 1rem;
+            text-align: left;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+        }
+
+        .points-table th {
+            background: rgba(255, 255, 255, 0.1);
+            color: #ffffff;
+            font-weight: 600;
+        }
+
+        .points-table td {
+            color: #86868b;
+        }
+
+        .points-input {
+            width: 80px;
+            padding: 0.5rem;
+            background: rgba(255, 255, 255, 0.05);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            border-radius: 5px;
+            color: #ffffff;
+            text-align: center;
+        }
+
+        .points-input:focus {
+            outline: none;
+            border-color: rgba(255, 255, 255, 0.4);
+        }
+
+        .save-btn {
+            background: rgba(76, 175, 80, 0.2);
+            border: 1px solid rgba(76, 175, 80, 0.3);
+            border-radius: 5px;
+            padding: 0.5rem 1rem;
+            color: #4CAF50;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .save-btn:hover {
+            background: rgba(76, 175, 80, 0.3);
+            transform: translateY(-1px);
+        }
+
+        @media (max-width: 768px) {
+            .points-table {
+                display: block;
+                overflow-x: auto;
+            }
+        }
+
+        .section-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 1.5rem;
+        }
+
+        .table-controls {
+            display: flex;
+            gap: 1rem;
+        }
+
+        .search-input {
+            padding: 0.5rem 1rem;
+            background: rgba(255, 255, 255, 0.05);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            border-radius: 5px;
+            color: #ffffff;
+            width: 200px;
+        }
+
+        .sort-select {
+            padding: 0.5rem 1rem;
+            background: rgba(255, 255, 255, 0.05);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            border-radius: 5px;
+            color: #ffffff;
+            cursor: pointer;
+        }
+
+        .sort-select option {
+            background: #1a1a1a;
+            color: #ffffff;
+        }
+
+        .search-input:focus,
+        .sort-select:focus {
+            outline: none;
+            border-color: rgba(255, 255, 255, 0.4);
+        }
+
+        .team-name-input {
+            width: 150px;
+            padding: 0.5rem;
+            background: rgba(255, 255, 255, 0.05);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            border-radius: 5px;
+            color: #ffffff;
+            text-align: left;
+        }
+
+        .team-name-input:focus {
+            outline: none;
+            border-color: rgba(255, 255, 255, 0.4);
+        }
+
+        .team-name-input::placeholder {
+            color: rgba(255, 255, 255, 0.5);
+        }
+
+        .add-team-btn {
+            background: rgba(76, 175, 80, 0.2);
+            border: 1px solid rgba(76, 175, 80, 0.3);
+            border-radius: 5px;
+            padding: 0.5rem 1rem;
+            color: #4CAF50;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            font-size: 0.9rem;
+        }
+
+        .add-team-btn:hover {
+            background: rgba(76, 175, 80, 0.3);
+            transform: translateY(-1px);
+        }
+
+        .add-team-btn i {
+            font-size: 0.8rem;
+        }
+
+        .delete-btn {
+            background: rgba(244, 67, 54, 0.2);
+            border: 1px solid rgba(244, 67, 54, 0.3);
+            border-radius: 5px;
+            padding: 0.5rem 1rem;
+            color: #f44336;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            margin-left: 0.5rem;
+        }
+
+        .delete-btn:hover {
+            background: rgba(244, 67, 54, 0.3);
+            transform: translateY(-1px);
+        }
+
+        .modal {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.5);
+            backdrop-filter: blur(5px);
+            justify-content: center;
+            align-items: center;
+            z-index: 1000;
+        }
+
+        .modal-content {
+            background: rgba(255, 255, 255, 0.1);
+            backdrop-filter: blur(10px);
+            padding: 2rem;
+            border-radius: 20px;
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            max-width: 400px;
+            width: 90%;
+        }
+
+        .modal-title {
+            color: #ffffff;
+            margin: 0 0 1rem 0;
+            font-size: 1.2rem;
+        }
+
+        .modal-message {
+            color: #86868b;
+            margin-bottom: 1.5rem;
+        }
+
+        .modal-buttons {
+            display: flex;
+            gap: 1rem;
+            justify-content: flex-end;
+        }
+
+        .modal-btn {
+            padding: 0.5rem 1rem;
+            border-radius: 5px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .modal-btn.cancel {
+            background: rgba(255, 255, 255, 0.1);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            color: #ffffff;
+        }
+
+        .modal-btn.confirm {
+            background: rgba(76, 175, 80, 0.2);
+            border: 1px solid rgba(76, 175, 80, 0.3);
+            color: #4CAF50;
+        }
+
+        .modal-btn:hover {
+            transform: translateY(-1px);
+        }
+
+        .bonus-points {
+            color: #4CAF50;
+            font-size: 0.8em;
+            margin-left: 5px;
+        }
+
+        .points-input {
+            width: 80px;
+            padding: 0.5rem;
+            background: rgba(255, 255, 255, 0.05);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            border-radius: 5px;
+            color: #ffffff;
+            text-align: center;
+            -moz-appearance: textfield;
+        }
+
+        .points-input::-webkit-outer-spin-button,
+        .points-input::-webkit-inner-spin-button {
+            -webkit-appearance: none;
+            margin: 0;
+        }
+
+        .update-points-btn {
+            background: rgba(33, 150, 243, 0.2);
+            border: 1px solid rgba(33, 150, 243, 0.3);
+            border-radius: 5px;
+            padding: 0.5rem 1rem;
+            color: #2196F3;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            font-size: 0.9rem;
+        }
+
+        .update-points-btn:hover {
+            background: rgba(33, 150, 243, 0.3);
+            transform: translateY(-1px);
+        }
+
+        .update-points-btn i {
+            font-size: 0.8rem;
+        }
+
+        .toast-notification {
+            position: fixed;
+            bottom: 2rem;
+            right: 2rem;
+            background: rgba(76, 175, 80, 0.9);
+            color: white;
+            padding: 1rem 2rem;
+            border-radius: 8px;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+            z-index: 1000;
+            transform: translateY(100px);
+            opacity: 0;
+            transition: all 0.3s ease;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .toast-notification.show {
+            transform: translateY(0);
+            opacity: 1;
+        }
+
+        .toast-notification i {
+            font-size: 1.2rem;
+        }
+
+        .toast-undo-btn {
+            background: rgba(255, 255, 255, 0.2);
+            border: none;
+            color: white;
+            padding: 0.3rem 0.8rem;
+            border-radius: 4px;
+            margin-left: 1rem;
+            cursor: pointer;
+            transition: all 0.2s ease;
+        }
+
+        .toast-undo-btn:hover {
+            background: rgba(255, 255, 255, 0.3);
+        }
+
+        .admin-actions {
+            display: flex;
+            gap: 1rem;
+        }
+
+        .refresh-btn {
+            background: rgba(255, 255, 255, 0.1);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            border-radius: 980px;
+            padding: 0.6rem 1.2rem;
+            color: #ffffff;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            font-size: 0.85rem;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .refresh-btn:hover {
+            background: rgba(255, 255, 255, 0.2);
+            transform: translateY(-2px);
+        }
+
+        .refresh-btn i {
+            font-size: 0.9rem;
+        }
+
+        @keyframes spin {
+            from { transform: rotate(0deg); }
+            to { transform: rotate(360deg); }
+        }
+
+        .refresh-btn.refreshing i {
+            animation: spin 1s linear infinite;
+        }
+
+        .team-id-input {
+            width: 80px;
+            padding: 0.5rem;
+            background: rgba(255, 255, 255, 0.05);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            border-radius: 5px;
+            color: #ffffff;
+            text-align: center;
+        }
+
+        .team-id-input:focus {
+            outline: none;
+            border-color: rgba(255, 255, 255, 0.4);
+        }
+
+        .team-id-input::placeholder {
+            color: rgba(255, 255, 255, 0.5);
+        }
+
+        .top-three {
+            background: rgba(255, 255, 255, 0.05);
+        }
+        .top-three:nth-child(1) {
+            background: linear-gradient(90deg, rgba(255, 215, 0, 0.1), rgba(255, 215, 0, 0.05));
+        }
+        .top-three:nth-child(2) {
+            background: linear-gradient(90deg, rgba(192, 192, 192, 0.1), rgba(192, 192, 192, 0.05));
+        }
+        .top-three:nth-child(3) {
+            background: linear-gradient(90deg, rgba(205, 127, 50, 0.1), rgba(205, 127, 50, 0.05));
+        }
+        .rank {
+            font-weight: 600;
+            color: #ffffff;
+            text-align: center;
+        }
+    </style>
+</head>
+<body>
+    <div class="admin-container">
+        <nav class="admin-nav">
+            <div class="nav-left">
+                <a href="index.html" class="back-home-btn">
+                    <i class="fas fa-arrow-left"></i> Back to Home
+                </a>
+            </div>
+            <h1>Code Arena Admin</h1>
+            <button class="logout-btn" onclick="logout()" style="display: none;">Logout</button>
+        </nav>
+
+        <!-- Login Form -->
+        <div class="login-container" id="loginContainer">
+            <form class="login-form" onsubmit="handleLogin(event)">
+                <h2>Admin Login</h2>
+                <div class="form-group">
+                    <label for="username">Username</label>
+                    <input type="text" id="username" required>
+                </div>
+                <div class="form-group">
+                    <label for="password">Password</label>
+                    <input type="password" id="password" required>
+                </div>
+                <button type="submit" class="login-btn">Login</button>
+            </form>
+        </div>
+
+        <!-- Dashboard -->
+        <div class="dashboard" id="dashboard">
+            <div class="admin-header">
+                <h1>Admin Dashboard</h1>
+                <div class="admin-actions">
+                    <button class="refresh-btn" onclick="refreshAdminData()">
+                        <i class="fas fa-sync-alt"></i> Refresh
+                    </button>
+                    <button class="update-points-btn" onclick="updatePointsTable()">
+                        <i class="fas fa-table"></i> Update Points Table
+                    </button>
+                </div>
+            </div>
+
+            <div class="dashboard-stats">
+                <div class="stat-card">
+                    <i class="fas fa-users"></i>
+                    <div class="stat-info">
+                        <h3>Total Teams</h3>
+                        <p>24</p>
+                    </div>
+                </div>
+                <div class="stat-card">
+                    <h3>Active Rounds</h3>
+                    <p>2</p>
+                </div>
+                <div class="stat-card">
+                    <h3>Total Points</h3>
+                    <p>1,250</p>
+                </div>
+            </div>
+
+            <div class="points-management">
+                <div class="section-header">
+                    <h3 class="section-title">Points Management</h3>
+                    <div class="table-controls">
+                        <button class="add-team-btn" onclick="addNewTeam()">
+                            <i class="fas fa-plus"></i> Add New Team
+                        </button>
+                        <button class="update-points-btn" onclick="updatePointsTable()">
+                            <i class="fas fa-sync"></i> Update Points Table
+                        </button>
+                        <input type="text" id="searchInput" placeholder="Search teams..." class="search-input">
+                        <select id="sortSelect" class="sort-select">
+                            <option value="id">Sort by ID</option>
+                            <option value="name">Sort by Name</option>
+                            <option value="total">Sort by Total Points</option>
+                        </select>
+                    </div>
+                </div>
+                <div class="table-container">
+                    <table class="points-table">
+                        <thead>
+                            <tr>
+                                <th>Rank</th>
+                                <th>Slot</th>
+                                <th>Team Name</th>
+                                <th>Round 1 Points</th>
+                                <th>Round 2 Points</th>
+                                <th>Total Points</th>
+                                <th>Actions</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr>
+                                <td class="rank">1</td>
+                                <td>1</td>
+                                <td><input type="text" class="team-name-input" value="Team-001" onchange="validateTeamName(this)"></td>
+                                <td><input type="number" class="points-input" value="50" min="0" max="100" onchange="validateInput(this)"></td>
+                                <td><input type="number" class="points-input" value="75" min="0" max="100" onchange="validateInput(this)"></td>
+                                <td>125</td>
+                                <td>
+                                    <button class="save-btn" onclick="savePoints('Team-001')">Save</button>
+                                    <button class="delete-btn" onclick="confirmDeleteTeam('Team-001')">Delete</button>
+                                </td>
+                            </tr>
+                            <tr>
+                                <td class="rank">2</td>
+                                <td>2</td>
+                                <td><input type="text" class="team-name-input" value="Team-002" onchange="validateTeamName(this)"></td>
+                                <td><input type="number" class="points-input" value="60" min="0" max="100" onchange="validateInput(this)"></td>
+                                <td><input type="number" class="points-input" value="80" min="0" max="100" onchange="validateInput(this)"></td>
+                                <td>140</td>
+                                <td>
+                                    <button class="save-btn" onclick="savePoints('Team-002')">Save</button>
+                                    <button class="delete-btn" onclick="confirmDeleteTeam('Team-002')">Delete</button>
+                                </td>
+                            </tr>
+                            <tr>
+                                <td class="rank">3</td>
+                                <td>3</td>
+                                <td><input type="text" class="team-name-input" value="Team-003" onchange="validateTeamName(this)"></td>
+                                <td><input type="number" class="points-input" value="45" min="0" max="100" onchange="validateInput(this)"></td>
+                                <td><input type="number" class="points-input" value="65" min="0" max="100" onchange="validateInput(this)"></td>
+                                <td>110</td>
+                                <td>
+                                    <button class="save-btn" onclick="savePoints('Team-003')">Save</button>
+                                    <button class="delete-btn" onclick="confirmDeleteTeam('Team-003')">Delete</button>
+                                </td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+
+            <div class="dashboard-actions">
+            </div>
+        </div>
+    </div>
+
+    <!-- Confirmation Modal -->
+    <div class="modal" id="confirmationModal">
+        <div class="modal-content">
+            <h3 class="modal-title" id="modalTitle">Confirm Action</h3>
+            <p class="modal-message" id="modalMessage"></p>
+            <div class="modal-buttons">
+                <button class="modal-btn cancel" onclick="closeModal()">Cancel</button>
+                <button class="modal-btn confirm" onclick="confirmAction()">Confirm</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Toast Notification -->
+    <div class="toast-notification" id="toastNotification">
+        <i class="fas fa-check-circle"></i>
+        <span id="toastMessage"></span>
+        <button class="toast-undo-btn" onclick="undoLastSave()">Undo</button>
+    </div>
+
+    <script>
+        // Simple authentication check (replace with proper authentication)
+        let lastSaveData = null;
+
+        function showToast(message, saveData) {
+            const toast = document.getElementById('toastNotification');
+            const toastMessage = document.getElementById('toastMessage');
+            toastMessage.textContent = message;
+            lastSaveData = saveData;
+            toast.classList.add('show');
+            
+            // Hide after 3 seconds
+            setTimeout(() => {
+                toast.classList.remove('show');
+            }, 3000);
+        }
+
+        function undoLastSave() {
+            if (!lastSaveData) return;
+
+            const { teamId, previousData } = lastSaveData;
+            const pointsData = JSON.parse(localStorage.getItem('pointsTableData') || '[]');
+            
+            // Restore previous data
+            const updatedPointsData = pointsData.filter(team => team.teamId !== teamId);
+            localStorage.setItem('pointsTableData', JSON.stringify(updatedPointsData));
+
+            // Update the UI
+            const tbody = document.querySelector('.points-table tbody');
+            tbody.innerHTML = '';
+            loadSavedPoints();
+
+            // Update stats and points table
+            updateTotalPointsStats();
+            updatePointsTable();
+
+            // Hide the toast
+            document.getElementById('toastNotification').classList.remove('show');
+            lastSaveData = null;
+        }
+
+        function handleLogin(event) {
+            event.preventDefault();
+            const username = document.getElementById('username').value;
+            const password = document.getElementById('password').value;
+
+            // Replace with proper authentication
+            if (username === 'admin' && password === 'admin123') {
+                document.getElementById('loginContainer').style.display = 'none';
+                document.getElementById('dashboard').style.display = 'block';
+                document.querySelector('.logout-btn').style.display = 'block';
+                loadSavedPoints(); // Load saved points when logging in
+            } else {
+                alert('Invalid credentials');
+            }
+        }
+
+        function logout() {
+            document.getElementById('loginContainer').style.display = 'flex';
+            document.getElementById('dashboard').style.display = 'none';
+            document.querySelector('.logout-btn').style.display = 'none';
+        }
+
+        function manageParticipants() {
+            alert('Manage Participants functionality coming soon');
+        }
+
+        function manageRounds() {
+            alert('Manage Rounds functionality coming soon');
+        }
+
+        function viewResults() {
+            alert('View Results functionality coming soon');
+        }
+
+        function updateRanks() {
+            const tbody = document.querySelector('.points-table tbody');
+            const rows = Array.from(tbody.querySelectorAll('tr'));
+            
+            // Sort rows by total points in descending order
+            rows.sort((a, b) => {
+                const aPoints = parseFloat(a.querySelector('td:nth-child(6)').textContent);
+                const bPoints = parseFloat(b.querySelector('td:nth-child(6)').textContent);
+                return bPoints - aPoints;
+            });
+            
+            // Update ranks
+            rows.forEach((row, index) => {
+                const rankCell = row.querySelector('.rank');
+                rankCell.textContent = index + 1;
+                
+                // Add special styling for top 3
+                row.classList.remove('top-three');
+                if (index < 3) {
+                    row.classList.add('top-three');
+                }
+            });
+            
+            // Reorder rows in the table
+            rows.forEach(row => tbody.appendChild(row));
+        }
+
+        function updateTotalPoints(row) {
+            const round1Input = row.querySelector('td:nth-child(4) input');
+            const round2Input = row.querySelector('td:nth-child(5) input');
+            
+            const round1Points = parseFloat(round1Input.value) || 0;
+            const round2Points = parseFloat(round2Input.value) || 0;
+            
+            // Calculate total points
+            const totalPoints = round1Points + round2Points;
+            
+            // Update total points cell
+            const totalCell = row.querySelector('td:nth-child(6)');
+            totalCell.textContent = totalPoints.toFixed(2);
+
+            // Update ranks after points change
+            updateRanks();
+
+            return { round1Points, round2Points, totalPoints };
+        }
+
+        function validateInput(input) {
+            let value = parseFloat(input.value);
+            // Round to 2 decimal places
+            value = Math.round(value * 100) / 100;
+            
+            // Validate minimum and maximum
+            if (value < 0) value = 0;
+            if (value > 100) value = 100;
+            
+            // Update input value
+            input.value = value;
+            
+            // Update total points
+            updateTotalPoints(input.closest('tr'));
+        }
+
+        function validateTeamName(input) {
+            const value = input.value.trim();
+            if (value === '') {
+                const row = input.closest('tr');
+                const slot = row.querySelector('td:nth-child(2)').textContent;
+                input.value = `Team-${String(slot).padStart(3, '0')}`;
+            }
+            
+            // Update the save button's onclick handler
+            const saveBtn = row.querySelector('.save-btn');
+            saveBtn.onclick = () => savePoints(input.value);
+        }
+
+        function savePoints(teamId) {
+            const row = event.target.closest('tr');
+            const points = updateTotalPoints(row);
+            
+            // Get current data
+            const pointsData = JSON.parse(localStorage.getItem('pointsTableData') || '[]');
+            
+            // Find and update the team
+            const teamIndex = pointsData.findIndex(team => team.teamName === teamId);
+            if (teamIndex !== -1) {
+                const updatedTeam = {
+                    ...pointsData[teamIndex],
+                    round1Points: points.round1Points,
+                    round2Points: points.round2Points,
+                    totalPoints: points.totalPoints
+                };
+                
+                pointsData[teamIndex] = updatedTeam;
+                
+                // Save updated data
+                localStorage.setItem('pointsTableData', JSON.stringify(pointsData));
+                
+                // Update stats and show toast
+                updateStats();
+                showToast(`Points saved for ${updatedTeam.teamName}`);
+            }
+        }
+
+        function updateStats() {
+            const pointsData = JSON.parse(localStorage.getItem('pointsTableData') || '[]');
+            
+            // Update total teams count
+            const totalTeamsElement = document.querySelector('.stat-card:first-child p');
+            totalTeamsElement.textContent = pointsData.length;
+            
+            // Update total points
+            const totalPoints = pointsData.reduce((sum, team) => sum + (team.totalPoints || 0), 0);
+            const totalPointsElement = document.querySelector('.stat-card:last-child p');
+            totalPointsElement.textContent = totalPoints.toFixed(2);
+        }
+
+        function loadSavedPoints() {
+            const pointsData = JSON.parse(localStorage.getItem('pointsTableData') || '[]');
+            const tbody = document.querySelector('.points-table tbody');
+            tbody.innerHTML = ''; // Clear existing rows
+            
+            // Sort teams by slot number
+            const sortedTeams = pointsData.sort((a, b) => {
+                const aSlot = parseInt(a.teamName.split('-')[1]);
+                const bSlot = parseInt(b.teamName.split('-')[1]);
+                return aSlot - bSlot;
+            });
+            
+            // Create document fragment for better performance
+            const fragment = document.createDocumentFragment();
+            
+            sortedTeams.forEach((team, index) => {
+                const tr = document.createElement('tr');
+                tr.innerHTML = `
+                    <td class="rank">${index + 1}</td>
+                    <td>${index + 1}</td>
+                    <td><input type="text" class="team-name-input" value="${team.teamName}" onchange="validateTeamName(this)"></td>
+                    <td><input type="number" class="points-input" value="${team.round1Points || 0}" min="0" max="100" onchange="validateInput(this)"></td>
+                    <td><input type="number" class="points-input" value="${team.round2Points || 0}" min="0" max="100" onchange="validateInput(this)"></td>
+                    <td class="total-points">${(team.totalPoints || 0).toFixed(2)}</td>
+                    <td>
+                        <button class="save-btn" onclick="savePoints('${team.teamName}')">Save</button>
+                        <button class="delete-btn" onclick="deleteTeam(this)">Delete</button>
+                    </td>
+                `;
+                fragment.appendChild(tr);
+                
+                // Add event listeners for points input
+                const round1Input = tr.querySelector('td:nth-child(4) input');
+                const round2Input = tr.querySelector('td:nth-child(5) input');
+                
+                round1Input.addEventListener('input', () => updateTotalPoints(tr));
+                round2Input.addEventListener('input', () => updateTotalPoints(tr));
+            });
+            
+            // Append all rows at once
+            tbody.appendChild(fragment);
+            
+            // Update stats and ranks
+            updateStats();
+            updateRanks();
+        }
+
+        // Search functionality
+        document.getElementById('searchInput').addEventListener('input', function() {
+            const searchText = this.value.toLowerCase();
+            const rows = document.querySelectorAll('.points-table tbody tr');
+            
+            rows.forEach(row => {
+                const teamName = row.querySelector('td:nth-of-type(3)').textContent.toLowerCase();
+                row.style.display = teamName.includes(searchText) ? '' : 'none';
+            });
+        });
+
+        // Sorting functionality
+        document.getElementById('sortSelect').addEventListener('change', function() {
+            const sortBy = this.value;
+            const tbody = document.querySelector('.points-table tbody');
+            const rows = Array.from(tbody.querySelectorAll('tr'));
+
+            rows.sort((a, b) => {
+                let aValue, bValue;
+                switch(sortBy) {
+                    case 'id':
+                        aValue = parseInt(a.querySelector('td:nth-of-type(2)').textContent);
+                        bValue = parseInt(b.querySelector('td:nth-of-type(2)').textContent);
+                        break;
+                    case 'name':
+                        aValue = a.querySelector('td:nth-of-type(3)').textContent;
+                        bValue = b.querySelector('td:nth-of-type(3)').textContent;
+                        break;
+                    case 'total':
+                        aValue = parseFloat(a.querySelector('td:nth-of-type(6)').textContent);
+                        bValue = parseFloat(b.querySelector('td:nth-of-type(6)').textContent);
+                        break;
+                }
+                return aValue > bValue ? 1 : -1;
+            });
+
+            rows.forEach(row => tbody.appendChild(row));
+        });
+
+        const MAX_TEAMS = 50;
+        let pendingAction = null;
+
+        function showModal(title, message, action) {
+            document.getElementById('modalTitle').textContent = title;
+            document.getElementById('modalMessage').textContent = message;
+            pendingAction = action;
+            document.getElementById('confirmationModal').style.display = 'flex';
+        }
+
+        function closeModal() {
+            document.getElementById('confirmationModal').style.display = 'none';
+            pendingAction = null;
+        }
+
+        function confirmAction() {
+            if (pendingAction) {
+                pendingAction();
+                closeModal();
+            }
+        }
+
+        function addNewTeam() {
+            const tbody = document.querySelector('.points-table tbody');
+            const currentTeams = tbody.querySelectorAll('tr').length;
+            const newTeamName = `Team-${String(currentTeams + 1).padStart(3, '0')}`;
+            
+            // Create new team data
+            const newTeam = {
+                teamName: newTeamName,
+                round1Points: 0,
+                round2Points: 0,
+                totalPoints: 0
+            };
+            
+            // Get existing data and add new team
+            const pointsData = JSON.parse(localStorage.getItem('pointsTableData') || '[]');
+            pointsData.push(newTeam);
+            
+            // Save updated data
+            localStorage.setItem('pointsTableData', JSON.stringify(pointsData));
+            
+            // Add new row to table
+            const tr = document.createElement('tr');
+            tr.innerHTML = `
+                <td class="rank">${currentTeams + 1}</td>
+                <td>${currentTeams + 1}</td>
+                <td><input type="text" class="team-name-input" value="${newTeamName}" onchange="validateTeamName(this)"></td>
+                <td><input type="number" class="points-input" value="0" min="0" max="100" onchange="validateInput(this)"></td>
+                <td><input type="number" class="points-input" value="0" min="0" max="100" onchange="validateInput(this)"></td>
+                <td class="total-points">0</td>
+                <td>
+                    <button class="save-btn" onclick="savePoints('${newTeamName}')">Save</button>
+                    <button class="delete-btn" onclick="deleteTeam(this)">Delete</button>
+                </td>
+            `;
+            
+            tbody.appendChild(tr);
+            updateStats();
+            updateRanks();
+            showToast('New team added successfully');
+        }
+
+        function deleteTeam(button) {
+            const tr = button.closest('tr');
+            const teamName = tr.querySelector('.team-name-input').value;
+            
+            // Get current data and remove the team
+            const pointsData = JSON.parse(localStorage.getItem('pointsTableData') || '[]');
+            const updatedPointsData = pointsData.filter(team => team.teamName !== teamName);
+            
+            // Reorder remaining teams
+            const reorderedTeams = updatedPointsData.map((team, index) => {
+                const newName = `Team-${String(index + 1).padStart(3, '0')}`;
+                return {
+                    ...team,
+                    teamName: newName
+                };
+            });
+            
+            // Save reordered data
+            localStorage.setItem('pointsTableData', JSON.stringify(reorderedTeams));
+            
+            // Remove the row from the table
+            tr.remove();
+            
+            // Reorder remaining rows
+            const tbody = document.querySelector('.points-table tbody');
+            const rows = tbody.querySelectorAll('tr');
+            rows.forEach((row, index) => {
+                const newName = `Team-${String(index + 1).padStart(3, '0')}`;
+                row.querySelector('td:nth-child(2)').textContent = index + 1;
+                row.querySelector('.team-name-input').value = newName;
+                
+                // Update save button onclick handler
+                const saveBtn = row.querySelector('.save-btn');
+                saveBtn.onclick = () => savePoints(newName);
+            });
+            
+            updateStats();
+            updateRanks();
+            showToast('Team deleted successfully');
+        }
+
+        function updatePointsTable() {
+            const pointsData = JSON.parse(localStorage.getItem('pointsTableData') || '[]');
+            
+            // Sort teams by total points in descending order
+            const sortedTeams = pointsData.sort((a, b) => b.totalPoints - a.totalPoints);
+            
+            // Format data for points table with rank
+            const formattedData = sortedTeams.map((team, index) => ({
+                rank: index + 1,
+                teamName: team.teamName,
+                round1Points: team.round1Points,
+                round2Points: team.round2Points,
+                totalPoints: team.totalPoints
+            }));
+
+            // Store the formatted data for the points page
+            localStorage.setItem('pointsTableData', JSON.stringify(formattedData));
+            
+            // Update the display table
+            const tbody = document.querySelector('.points-table tbody');
+            tbody.innerHTML = ''; // Clear existing rows
+            
+            // Create document fragment for better performance
+            const fragment = document.createDocumentFragment();
+            
+            sortedTeams.forEach((team, index) => {
+                const tr = document.createElement('tr');
+                tr.innerHTML = `
+                    <td class="rank">${index + 1}</td>
+                    <td>${parseInt(team.teamName.split('-')[1])}</td>
+                    <td><input type="text" class="team-name-input" value="${team.teamName}" onchange="validateTeamName(this)"></td>
+                    <td><input type="number" class="points-input" value="${team.round1Points || 0}" min="0" max="100" onchange="validateInput(this)"></td>
+                    <td><input type="number" class="points-input" value="${team.round2Points || 0}" min="0" max="100" onchange="validateInput(this)"></td>
+                    <td class="total-points">${(team.totalPoints || 0).toFixed(2)}</td>
+                    <td>
+                        <button class="save-btn" onclick="savePoints('${team.teamName}')">Save</button>
+                        <button class="delete-btn" onclick="deleteTeam(this)">Delete</button>
+                    </td>
+                `;
+                fragment.appendChild(tr);
+                
+                // Add event listeners for points input
+                const round1Input = tr.querySelector('td:nth-child(4) input');
+                const round2Input = tr.querySelector('td:nth-child(5) input');
+                
+                round1Input.addEventListener('input', () => updateTotalPoints(tr));
+                round2Input.addEventListener('input', () => updateTotalPoints(tr));
+            });
+            
+            // Append all rows at once
+            tbody.appendChild(fragment);
+            
+            // Update stats and ranks
+            updateStats();
+            updateRanks();
+            
+            // Show success message
+            showToast('Points table updated successfully');
+        }
+
+        function refreshAdminData() {
+            const refreshBtn = document.querySelector('.refresh-btn');
+            refreshBtn.classList.add('refreshing');
+            
+            // Refresh the points table
+            updatePointsTable();
+            
+            // Refresh the stats
+            updateTotalPointsStats();
+            
+            // Simulate a small delay to show the refresh animation
+            setTimeout(() => {
+                refreshBtn.classList.remove('refreshing');
+                showToast('Data refreshed successfully');
+            }, 1000);
+        }
+
+        // Add auto-save functionality
+        let autoSaveTimeout;
+        function setupAutoSave(input) {
+            input.addEventListener('input', () => {
+                clearTimeout(autoSaveTimeout);
+                autoSaveTimeout = setTimeout(() => {
+                    const row = input.closest('tr');
+                    const teamName = row.querySelector('.team-name-input').value;
+                    savePoints(teamName);
+                }, 1000); // Auto-save after 1 second of no changes
+            });
+        }
+
+        // Initialize auto-save for all inputs
+        function initializeAutoSave() {
+            const inputs = document.querySelectorAll('.points-input');
+            inputs.forEach(input => setupAutoSave(input));
+        }
+
+        // Call initializeAutoSave after loading points
+        document.addEventListener('DOMContentLoaded', () => {
+            loadSavedPoints();
+            initializeAutoSave();
+        });
+    </script>
+</body>
+</html> 
