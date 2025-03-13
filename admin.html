@@ -635,6 +635,65 @@
             color: #ffffff;
             text-align: center;
         }
+
+        .admin-log-section {
+            background: rgba(255, 255, 255, 0.1);
+            backdrop-filter: blur(10px);
+            padding: 1.5rem;
+            border-radius: 20px;
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            margin-top: 2rem;
+        }
+
+        .log-entry {
+            padding: 1rem;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+            display: grid;
+            grid-template-columns: 200px 150px 1fr;
+            gap: 1rem;
+            align-items: center;
+        }
+
+        .log-entry:last-child {
+            border-bottom: none;
+        }
+
+        .log-timestamp {
+            color: #86868b;
+            font-size: 0.9rem;
+            font-family: monospace;
+        }
+
+        .log-action {
+            color: #ffffff;
+            font-weight: 500;
+        }
+
+        .log-details {
+            color: #86868b;
+        }
+
+        .log-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 1rem;
+        }
+
+        .clear-logs-btn {
+            background: rgba(244, 67, 54, 0.2);
+            border: 1px solid rgba(244, 67, 54, 0.3);
+            border-radius: 5px;
+            padding: 0.5rem 1rem;
+            color: #f44336;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .clear-logs-btn:hover {
+            background: rgba(244, 67, 54, 0.3);
+            transform: translateY(-1px);
+        }
     </style>
 </head>
 <body>
@@ -770,6 +829,18 @@
                 </div>
             </div>
 
+            <div class="admin-log-section">
+                <div class="log-header">
+                    <h3 class="section-title">Admin Activity Log</h3>
+                    <button class="clear-logs-btn" onclick="adminLog.clearLogs()">
+                        <i class="fas fa-trash"></i> Clear Logs
+                    </button>
+                </div>
+                <div id="adminLogContainer">
+                    <!-- Log entries will be displayed here -->
+                </div>
+            </div>
+
             <div class="dashboard-actions">
             </div>
         </div>
@@ -794,6 +865,7 @@
         <button class="toast-undo-btn" onclick="undoLastSave()">Undo</button>
     </div>
 
+    <script src="adminLog.js"></script>
     <script>
         // Simple authentication check (replace with proper authentication)
         let lastSaveData = null;
@@ -846,6 +918,9 @@
                 document.getElementById('dashboard').style.display = 'block';
                 document.querySelector('.logout-btn').style.display = 'block';
                 loadSavedPoints(); // Load saved points when logging in
+
+                // Log the action
+                adminLog.addLog('Admin Login', 'Admin logged in successfully');
             } else {
                 alert('Invalid credentials');
             }
@@ -855,6 +930,9 @@
             document.getElementById('loginContainer').style.display = 'flex';
             document.getElementById('dashboard').style.display = 'none';
             document.querySelector('.logout-btn').style.display = 'none';
+
+            // Log the action
+            adminLog.addLog('Admin Logout', 'Admin logged out');
         }
 
         function manageParticipants() {
@@ -970,6 +1048,12 @@
                 // Update stats and show toast
                 updateStats();
                 showToast(`Points saved for ${updatedTeam.teamName}`);
+
+                // Log the action
+                adminLog.addLog(
+                    'Points Updated',
+                    `Updated points for ${updatedTeam.teamName}: Round 1: ${points.round1Points}, Round 2: ${points.round2Points}, Total: ${points.totalPoints}`
+                );
             }
         }
 
@@ -1133,6 +1217,9 @@
             updateStats();
             updateRanks();
             showToast('New team added successfully');
+
+            // Log the action
+            adminLog.addLog('New Team Added', `Added new team: ${newTeamName}`);
         }
 
         function deleteTeam(button) {
@@ -1174,6 +1261,9 @@
             updateStats();
             updateRanks();
             showToast('Team deleted successfully');
+
+            // Log the action
+            adminLog.addLog('Team Deleted', `Deleted team: ${teamName}`);
         }
 
         function updatePointsTable() {
@@ -1276,6 +1366,7 @@
         document.addEventListener('DOMContentLoaded', () => {
             loadSavedPoints();
             initializeAutoSave();
+            adminLog.updateLogDisplay();
         });
     </script>
 </body>
