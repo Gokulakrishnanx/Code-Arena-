@@ -1,0 +1,31 @@
+name: Auto Update Repository
+
+on:
+  push:
+    branches:
+      - main
+  pull_request:
+    branches:
+      - main
+
+jobs:
+  update:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v2
+        with:
+          token: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Set up Git
+        run: |
+          git config --global user.name "GitHub Actions"
+          git config --global user.email "actions@github.com"
+
+      - name: Commit and push if changes exist
+        run: |
+          git add -A
+          timestamp=$(date -u)
+          git commit -m "Auto update: ${timestamp}" || exit 0
+          git push
