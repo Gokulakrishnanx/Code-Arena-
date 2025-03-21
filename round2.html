@@ -1,0 +1,374 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Round 2 - Code Arena</title>
+    <link rel="stylesheet" href="styles.css">
+    <style>
+        .page-content {
+            padding: 120px 5% 60px;
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+
+        .section {
+            margin-bottom: 80px;
+            opacity: 0;
+            animation: fadeIn 0.8s ease forwards;
+        }
+
+        .section-title {
+            font-size: 2.5rem;
+            margin-bottom: 2rem;
+            color: #ffffff;
+            font-weight: 700;
+            letter-spacing: -1px;
+        }
+
+        .section-content {
+            display: grid;
+            grid-template-columns: 1fr;
+            gap: 2rem;
+            max-width: 800px;
+            margin: 0 auto;
+        }
+
+        .card {
+            background: rgba(255, 255, 255, 0.05);
+            border-radius: 20px;
+            padding: 2rem;
+            transition: transform 0.3s ease;
+            backdrop-filter: blur(10px);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            width: 100%;
+        }
+
+        .card:hover {
+            transform: translateY(-5px);
+        }
+
+        .card-title {
+            font-size: 1.5rem;
+            margin-bottom: 1rem;
+            color: #ffffff;
+            font-weight: 600;
+        }
+
+        .card-text {
+            color: #86868b;
+            line-height: 1.6;
+            margin-bottom: 1.5rem;
+        }
+
+        .card-btn {
+            display: inline-block;
+            padding: 0.8rem 1.5rem;
+            background: rgba(255, 255, 255, 0.1);
+            color: #ffffff;
+            text-decoration: none;
+            border-radius: 980px;
+            font-size: 0.9rem;
+            transition: all 0.3s ease;
+        }
+
+        .card-btn:hover {
+            background: rgba(255, 255, 255, 0.2);
+            transform: translateY(-2px);
+        }
+
+        .back-btn {
+            position: fixed;
+            bottom: 2rem;
+            right: 2rem;
+            background: rgba(255, 255, 255, 0.1);
+            color: #ffffff;
+            padding: 1rem 2rem;
+            border-radius: 980px;
+            text-decoration: none;
+            font-size: 1rem;
+            transition: all 0.3s ease;
+            backdrop-filter: blur(10px);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            z-index: 100;
+        }
+
+        .back-btn:hover {
+            background: rgba(255, 255, 255, 0.2);
+            transform: translateY(-2px);
+        }
+
+        .modal {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.8);
+            backdrop-filter: blur(5px);
+            z-index: 1000;
+            justify-content: center;
+            align-items: center;
+        }
+
+        .modal-content {
+            background: rgba(255, 255, 255, 0.1);
+            backdrop-filter: blur(10px);
+            border-radius: 20px;
+            padding: 2rem;
+            max-width: 500px;
+            width: 90%;
+            border: 1px solid rgba(255, 255, 255, 0.1);
+        }
+
+        .modal-title {
+            font-size: 1.8rem;
+            color: #ffffff;
+            margin-bottom: 1.5rem;
+            text-align: center;
+        }
+
+        .language-options {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 1rem;
+            margin-bottom: 2rem;
+        }
+
+        .language-btn {
+            background: rgba(255, 255, 255, 0.1);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            border-radius: 12px;
+            padding: 1.5rem;
+            color: #ffffff;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            text-align: center;
+            font-size: 1.1rem;
+            font-weight: 500;
+        }
+
+        .language-btn:hover {
+            background: rgba(255, 255, 255, 0.2);
+            transform: translateY(-2px);
+        }
+
+        .close-modal {
+            display: block;
+            width: 100%;
+            padding: 0.8rem;
+            background: rgba(255, 255, 255, 0.1);
+            color: #ffffff;
+            border: none;
+            border-radius: 980px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            font-size: 1rem;
+        }
+
+        .close-modal:hover {
+            background: rgba(255, 255, 255, 0.2);
+        }
+
+        @media (max-width: 768px) {
+            .section-title {
+                font-size: 2rem;
+            }
+            
+            .card {
+                padding: 1.5rem;
+            }
+
+            .back-btn {
+                bottom: 1rem;
+                right: 1rem;
+                padding: 0.8rem 1.5rem;
+            }
+
+            .language-options {
+                grid-template-columns: 1fr;
+            }
+        }
+
+        .points-details {
+            margin-top: 1.5rem;
+        }
+
+        .difficulty-level {
+            background: rgba(255, 255, 255, 0.1);
+            border-radius: 12px;
+            padding: 1rem;
+            margin-bottom: 1rem;
+            border: 1px solid rgba(255, 255, 255, 0.2);
+        }
+
+        .difficulty-title {
+            color: #ffffff;
+            font-weight: 600;
+            margin-bottom: 0.5rem;
+            font-size: 1.1rem;
+        }
+
+        .easy-level {
+            border-left: 4px solid #4CAF50;
+        }
+
+        .medium-level {
+            border-left: 4px solid #FFA726;
+        }
+
+        .hard-level {
+            border-left: 4px solid #EF5350;
+        }
+
+        .overall-summary {
+            background: rgba(255, 255, 255, 0.1);
+            border-radius: 12px;
+            padding: 1rem;
+            margin-top: 1.5rem;
+            border: 1px solid rgba(255, 255, 255, 0.2);
+        }
+
+        .overall-title {
+            color: #ffffff;
+            font-weight: 600;
+            margin-bottom: 0.5rem;
+            font-size: 1.1rem;
+        }
+    </style>
+</head>
+<body>
+    <nav class="navbar">
+        <div class="logo">
+            <h1 onclick="window.location.href='index.html'" style="cursor: pointer;">Code Arena</h1>
+        </div>
+        <button class="start-btn" onclick="window.location.href='index.html'">Back to Home</button>
+    </nav>
+
+    <main class="page-content">
+        <section class="section">
+            <h2 class="section-title">Round 2</h2>
+            <div class="section-content">
+                <div class="card">
+                    <h3 class="card-title">Debugging Challenge</h3>
+                    <p class="card-text">The second round is designed to test participants' debugging skills. Participants can choose their preferred programming language: C, Java, or Python</p>
+                    <a href="#" class="card-btn" id="startQuizBtn">Start Challenge</a>
+                </div>
+                <div class="card">
+                    <h3 class="card-title">Points System</h3>
+                    <p class="card-text">Round 2 consists of three difficulty levels with different point values. Participants will be evaluated based on their ability to solve problems across all difficulty levels.</p>
+                    <div class="points-details">
+                        <div class="difficulty-level easy-level">
+                            <div class="difficulty-title">Easy Level</div>
+                            <p class="card-text">• 10 questions</p>
+                            <p class="card-text">• 2 points per question</p>
+                            <p class="card-text">• Total Points: 20</p>
+                        </div>
+
+                        <div class="difficulty-level medium-level">
+                            <div class="difficulty-title">Medium Level</div>
+                            <p class="card-text">• 5 questions</p>
+                            <p class="card-text">• 6 points per question</p>
+                            <p class="card-text">• Total Points: 30</p>
+                        </div>
+
+                        <div class="difficulty-level hard-level">
+                            <div class="difficulty-title">Hard Level</div>
+                            <p class="card-text">• 5 questions</p>
+                            <p class="card-text">• 10 points per question</p>
+                            <p class="card-text">• Total Points: 50</p>
+                        </div>
+
+                        <div class="overall-summary">
+                            <div class="overall-title">Overall Summary</div>
+                            <p class="card-text">• Total Questions: 21</p>
+                            <p class="card-text">• Total Points: 100</p>
+                        </div>
+                    </div>
+                </div>
+                <div class="card">
+                    <h3 class="card-title">Live Leaderboard</h3>
+                    <p class="card-text">Track your progress and see how you rank against other participants in real-time. The leaderboard updates automatically as participants submit their solutions.</p>
+                    <a href="#" class="card-btn" id="leaderboardBtn">View Leaderboard</a>
+                </div>
+            </div>
+        </section>
+    </main>
+
+    <!-- Language Selection Modal -->
+    <div class="modal" id="languageModal">
+        <div class="modal-content">
+            <h3 class="modal-title">Select One Programming Language</h3>
+            <div class="language-options">
+                <button class="language-btn" onclick="startQuiz('C')">C</button>
+                <button class="language-btn" onclick="startQuiz('Python')">Python</button>
+                <button class="language-btn" onclick="startQuiz('Java')">Java</button>
+            </div>
+            <button class="close-modal" onclick="closeModal()">Close</button>
+        </div>
+    </div>
+
+    <a href="index.html" class="back-btn">Back to Home</a>
+
+    <script>
+        // Add animation delay to sections
+        document.querySelectorAll('.section').forEach((section, index) => {
+            section.style.animationDelay = `${index * 0.2}s`;
+        });
+
+        // Navbar button functionality
+        document.querySelector('.start-btn').addEventListener('click', () => {
+            window.location.href = 'index.html';
+        });
+
+        // Add smooth scroll behavior
+        document.querySelectorAll('a[href^="#"]').forEach(anchor => {
+            anchor.addEventListener('click', function (e) {
+                e.preventDefault();
+                document.querySelector(this.getAttribute('href')).scrollIntoView({
+                    behavior: 'smooth'
+                });
+            });
+        });
+
+        // Modal functionality
+        const modal = document.getElementById('languageModal');
+        const startQuizBtn = document.getElementById('startQuizBtn');
+
+        startQuizBtn.addEventListener('click', (e) => {
+            e.preventDefault();
+            modal.style.display = 'flex';
+        });
+
+        function closeModal() {
+            modal.style.display = 'none';
+        }
+
+        function startQuiz(language) {
+            // Redirect to the appropriate HackerRank challenge based on language selection
+            let formUrl;
+            switch(language) {
+                case 'C':
+                    formUrl = 'https://www.hackerrank.com/codearena-c-program-round-2';
+                    break;
+                case 'Python':
+                    formUrl = 'https://www.hackerrank.com/codearena-python-round-2';
+                    break;
+                case 'Java':
+                    formUrl = 'https://www.hackerrank.com/codearena-javaround-2';
+                    break;
+            }
+            window.open(formUrl, '_blank');
+            closeModal();
+        }
+
+        // Close modal when clicking outside
+        window.addEventListener('click', (e) => {
+            if (e.target === modal) {
+                closeModal();
+            }
+        });
+    </script>
+</body>
+</html> 
