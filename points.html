@@ -1,0 +1,360 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Points Table - Code Arena</title>
+    <link rel="stylesheet" href="styles.css">
+    <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=SF+Pro+Display:wght@400;500;600;700&display=swap">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+    <style>
+        .page-content {
+            padding: 120px 5% 60px;
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+
+        .section {
+            margin-bottom: 80px;
+            opacity: 0;
+            animation: fadeIn 0.8s ease forwards;
+        }
+
+        .section-title {
+            font-size: 2.5rem;
+            color: #ffffff;
+            margin-bottom: 2rem;
+            text-align: center;
+        }
+
+        .points-table {
+            width: 100%;
+            border-collapse: collapse;
+            background: rgba(255, 255, 255, 0.05);
+            border-radius: 20px;
+            overflow: hidden;
+            backdrop-filter: blur(10px);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            table-layout: fixed;
+        }
+
+        .points-table th,
+        .points-table td {
+            padding: 1rem;
+            text-align: left;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+            overflow: hidden;
+            text-overflow: ellipsis;
+            white-space: nowrap;
+        }
+
+        .points-table th {
+            background: rgba(255, 255, 255, 0.1);
+            color: #ffffff;
+            font-weight: 600;
+        }
+
+        .points-table th:first-child,
+        .points-table td:first-child {
+            width: 80px;
+            text-align: center;
+        }
+
+        .points-table th:nth-child(2),
+        .points-table td:nth-child(2) {
+            width: 100px;
+        }
+
+        .points-table th:nth-child(3),
+        .points-table td:nth-child(3) {
+            width: auto;
+        }
+
+        .points-table th:last-child,
+        .points-table td:last-child {
+            width: 120px;
+            text-align: center;
+        }
+
+        .points-table td {
+            color: #86868b;
+        }
+
+        .points-table tr:last-child td {
+            border-bottom: none;
+        }
+
+        .points-table tr:hover {
+            background: rgba(255, 255, 255, 0.05);
+        }
+
+        .rank {
+            font-weight: 600;
+            color: #ffffff;
+        }
+
+        .team-id {
+            font-family: monospace;
+            color: #2196F3;
+        }
+
+        .team-name {
+            font-weight: 500;
+            color: #ffffff;
+        }
+
+        .points {
+            font-weight: 600;
+            color: #4CAF50;
+            text-align: center;
+        }
+
+        .back-btn {
+            position: fixed;
+            bottom: 2rem;
+            right: 2rem;
+            background: rgba(255, 255, 255, 0.1);
+            color: #ffffff;
+            padding: 1rem 2rem;
+            border-radius: 980px;
+            text-decoration: none;
+            font-size: 1rem;
+            transition: all 0.3s ease;
+            backdrop-filter: blur(10px);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            z-index: 100;
+        }
+
+        .back-btn:hover {
+            background: rgba(255, 255, 255, 0.2);
+            transform: translateY(-2px);
+        }
+
+        .refresh-container {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            margin-bottom: 1rem;
+        }
+
+        .refresh-btn {
+            background: rgba(255, 255, 255, 0.1);
+            color: #ffffff;
+            border: none;
+            border-radius: 50%;
+            width: 36px;
+            height: 36px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            font-size: 1rem;
+            margin-left: 1rem;
+        }
+
+        .refresh-btn:hover {
+            background: rgba(255, 255, 255, 0.2);
+            transform: rotate(180deg);
+        }
+
+        .refresh-btn i {
+            transition: all 0.3s ease;
+        }
+
+        .refresh-btn.refreshing i {
+            animation: spin 1s linear infinite;
+        }
+
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+
+        .last-updated {
+            color: #86868b;
+            font-size: 0.9rem;
+            text-align: center;
+            margin-top: 1rem;
+        }
+
+        /* Top 3 team styling */
+        .points-table tr.first-place {
+            background: linear-gradient(135deg, rgba(255, 215, 0, 0.1), rgba(255, 215, 0, 0.05));
+        }
+
+        .points-table tr.first-place td.rank {
+            color: #FFD700;
+            position: relative;
+        }
+
+        .points-table tr.first-place td.rank::before {
+            content: '🏆';
+            position: absolute;
+            left: 0.5rem;
+            top: 50%;
+            transform: translateY(-50%);
+            font-size: 0.8rem;
+        }
+
+        .points-table tr.second-place {
+            background: linear-gradient(135deg, rgba(192, 192, 192, 0.1), rgba(192, 192, 192, 0.05));
+        }
+
+        .points-table tr.second-place td.rank {
+            color: #C0C0C0;
+            position: relative;
+        }
+
+        .points-table tr.second-place td.rank::before {
+            content: '🥈';
+            position: absolute;
+            left: 0.5rem;
+            top: 50%;
+            transform: translateY(-50%);
+            font-size: 0.8rem;
+        }
+
+        .points-table tr.third-place {
+            background: linear-gradient(135deg, rgba(205, 127, 50, 0.1), rgba(205, 127, 50, 0.05));
+        }
+
+        .points-table tr.third-place td.rank {
+            color: #CD7F32;
+            position: relative;
+        }
+
+        .points-table tr.third-place td.rank::before {
+            content: '🥉';
+            position: absolute;
+            left: 0.5rem;
+            top: 50%;
+            transform: translateY(-50%);
+            font-size: 0.8rem;
+        }
+
+        .no-data {
+            text-align: center;
+            padding: 2rem;
+            color: #86868b;
+            font-style: italic;
+        }
+
+        @media (max-width: 768px) {
+            .points-table {
+                display: block;
+                overflow-x: auto;
+            }
+            
+            .back-btn {
+                bottom: 1rem;
+                right: 1rem;
+                padding: 0.8rem 1.5rem;
+            }
+        }
+    </style>
+</head>
+<body>
+    <nav class="navbar">
+        <div class="logo">
+            <h1 onclick="window.location.href='index.html'" style="cursor: pointer;">Code Arena</h1>
+        </div>
+        <button class="start-btn" onclick="window.location.href='index.html'">Back to Home</button>
+    </nav>
+
+    <main class="page-content">
+        <section class="section">
+            <h2 class="section-title">Live Points Table</h2>
+            <div class="refresh-container">
+                <span>Stay updated with the latest scores</span>
+                <button class="refresh-btn" onclick="refreshPointsTable()" title="Refresh Points Table">
+                    <i class="fas fa-sync-alt"></i>
+                </button>
+            </div>
+            <table class="points-table">
+                <thead>
+                    <tr>
+                        <th class="rank">Rank</th>
+                        <th>Team ID</th>
+                        <th>Team Name</th>
+                        <th class="points">Total Points</th>
+                    </tr>
+                </thead>
+                <tbody id="pointsTableBody">
+                    <!-- Points data will be populated here -->
+                </tbody>
+            </table>
+            <div class="last-updated" id="lastUpdated"></div>
+        </section>
+    </main>
+
+    <a href="index.html" class="back-btn">Back to Home</a>
+
+    <script>
+        // Function to update the points table
+        function updatePointsTable() {
+            const tbody = document.getElementById('pointsTableBody');
+            tbody.innerHTML = ''; // Clear existing rows
+
+            // Get points table data from localStorage
+            const pointsTableData = JSON.parse(localStorage.getItem('pointsTableData') || '[]');
+
+            if (pointsTableData.length === 0) {
+                const tr = document.createElement('tr');
+                tr.innerHTML = `<td colspan="4" class="no-data">No teams data available</td>`;
+                tbody.appendChild(tr);
+                return;
+            }
+
+            pointsTableData.forEach((team, index) => {
+                const tr = document.createElement('tr');
+                
+                // Add class for top 3 teams
+                if (index === 0) {
+                    tr.classList.add('first-place');
+                } else if (index === 1) {
+                    tr.classList.add('second-place');
+                } else if (index === 2) {
+                    tr.classList.add('third-place');
+                }
+                
+                tr.innerHTML = `
+                    <td class="rank">${team.rank}</td>
+                    <td class="team-id">${String(team.teamId).padStart(3, '0')}</td>
+                    <td class="team-name">${team.teamName}</td>
+                    <td class="points">${team.totalPoints}</td>
+                `;
+                tbody.appendChild(tr);
+            });
+
+            // Update last updated time
+            const lastUpdated = document.getElementById('lastUpdated');
+            const now = new Date();
+            lastUpdated.textContent = `Last updated: ${now.toLocaleString()}`;
+        }
+
+        // Function to refresh the points table
+        function refreshPointsTable() {
+            const refreshBtn = document.querySelector('.refresh-btn');
+            refreshBtn.classList.add('refreshing');
+            
+            // Simulate a network delay (remove this in a real application)
+            setTimeout(() => {
+                updatePointsTable();
+                refreshBtn.classList.remove('refreshing');
+            }, 500);
+        }
+
+        // Initial load
+        updatePointsTable();
+
+        // Refresh every 60 seconds
+        setInterval(refreshPointsTable, 60000);
+
+        // Add animation delay to sections
+        document.querySelectorAll('.section').forEach((section, index) => {
+            section.style.animationDelay = `${index * 0.2}s`;
+        });
+    </script>
+</body>
+</html> 

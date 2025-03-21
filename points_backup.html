@@ -1,0 +1,193 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Points Table - Code Arena</title>
+    <link rel="stylesheet" href="styles.css">
+    <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=SF+Pro+Display:wght@400;500;600;700&display=swap">
+    <style>
+        .page-content {
+            padding: 120px 5% 60px;
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+
+        .section {
+            margin-bottom: 80px;
+            opacity: 0;
+            animation: fadeIn 0.8s ease forwards;
+        }
+
+        .section-title {
+            font-size: 2.5rem;
+            color: #ffffff;
+            margin-bottom: 2rem;
+            text-align: center;
+        }
+
+        .points-table {
+            width: 100%;
+            border-collapse: collapse;
+            background: rgba(255, 255, 255, 0.05);
+            border-radius: 20px;
+            overflow: hidden;
+            backdrop-filter: blur(10px);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+        }
+
+        .points-table th,
+        .points-table td {
+            padding: 1rem;
+            text-align: left;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+        }
+
+        .points-table th {
+            background: rgba(255, 255, 255, 0.1);
+            color: #ffffff;
+            font-weight: 600;
+        }
+
+        .points-table td {
+            color: #86868b;
+        }
+
+        .points-table tr:last-child td {
+            border-bottom: none;
+        }
+
+        .points-table tr:hover {
+            background: rgba(255, 255, 255, 0.05);
+        }
+
+        .rank {
+            font-weight: 600;
+            color: #ffffff;
+        }
+
+        .points {
+            font-weight: 600;
+            color: #4CAF50;
+        }
+
+        .back-btn {
+            position: fixed;
+            bottom: 2rem;
+            right: 2rem;
+            background: rgba(255, 255, 255, 0.1);
+            color: #ffffff;
+            padding: 1rem 2rem;
+            border-radius: 980px;
+            text-decoration: none;
+            font-size: 1rem;
+            transition: all 0.3s ease;
+            backdrop-filter: blur(10px);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            z-index: 100;
+        }
+
+        .back-btn:hover {
+            background: rgba(255, 255, 255, 0.2);
+            transform: translateY(-2px);
+        }
+
+        @media (max-width: 768px) {
+            .points-table {
+                display: block;
+                overflow-x: auto;
+            }
+            
+            .back-btn {
+                bottom: 1rem;
+                right: 1rem;
+                padding: 0.8rem 1.5rem;
+            }
+        }
+    </style>
+</head>
+<body>
+    <nav class="navbar">
+        <div class="logo">
+            <h1 onclick="window.location.href='index.html'" style="cursor: pointer;">Code Arena</h1>
+        </div>
+        <button class="start-btn" onclick="window.location.href='index.html'">Back to Home</button>
+    </nav>
+
+    <main class="page-content">
+        <section class="section">
+            <h2 class="section-title">Live Points Table</h2>
+            <table class="points-table">
+                <thead>
+                    <tr>
+                        <th>Rank</th>
+                        <th>Participant</th>
+                        <th>Round 1</th>
+                        <th>Round 2</th>
+                        <th>Total Points</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <!-- Points data will be populated here -->
+                </tbody>
+            </table>
+        </section>
+    </main>
+
+    <a href="index.html" class="back-btn">Back to Home</a>
+
+    <script>
+        // Google Sheets API Configuration
+        const SPREADSHEET_ID = 'YOUR_SPREADSHEET_ID'; // Replace with your Google Sheet ID
+        const API_KEY = 'YOUR_API_KEY'; // Replace with your Google Sheets API key
+        const SHEET_NAME = 'Points'; // Replace with your sheet name
+
+        // Function to fetch data from Google Sheets
+        async function fetchPointsData() {
+            try {
+                const response = await fetch(`https://sheets.googleapis.com/v4/spreadsheets/${SPREADSHEET_ID}/values/${SHEET_NAME}!A2:E?key=${API_KEY}`);
+                const data = await response.json();
+                return data.values || [];
+            } catch (error) {
+                console.error('Error fetching points data:', error);
+                return [];
+            }
+        }
+
+        // Function to update the points table
+        function updatePointsTable(data) {
+            const tbody = document.querySelector('.points-table tbody');
+            tbody.innerHTML = ''; // Clear existing rows
+
+            data.forEach((row, index) => {
+                const tr = document.createElement('tr');
+                tr.innerHTML = `
+                    <td class="rank">${index + 1}</td>
+                    <td>${row[0]}</td>
+                    <td>${row[1]}</td>
+                    <td>${row[2]}</td>
+                    <td class="points">${row[3]}</td>
+                `;
+                tbody.appendChild(tr);
+            });
+        }
+
+        // Function to refresh the points table periodically
+        async function refreshPointsTable() {
+            const data = await fetchPointsData();
+            updatePointsTable(data);
+        }
+
+        // Initial load
+        refreshPointsTable();
+
+        // Refresh every 30 seconds
+        setInterval(refreshPointsTable, 30000);
+
+        // Add animation delay to sections
+        document.querySelectorAll('.section').forEach((section, index) => {
+            section.style.animationDelay = `${index * 0.2}s`;
+        });
+    </script>
+</body>
+</html> 
