@@ -1065,6 +1065,132 @@
     <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
     
     <script>
+        // API Base URL - Change this to your deployed backend URL
+        const API_URL = 'http://localhost:5000/api';
+
+        // Function to fetch all teams
+        async function fetchTeams() {
+            try {
+                const response = await fetch(`${API_URL}/teams`);
+                const teams = await response.json();
+                return teams;
+            } catch (error) {
+                console.error('Error fetching teams:', error);
+                return [];
+            }
+        }
+
+        // Function to add a new team
+        async function addTeam(teamData) {
+            try {
+                const response = await fetch(`${API_URL}/teams`, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify(teamData)
+                });
+                return await response.json();
+            } catch (error) {
+                console.error('Error adding team:', error);
+                throw error;
+            }
+        }
+
+        // Function to update team points
+        async function updateTeam(teamId, updates) {
+            try {
+                const response = await fetch(`${API_URL}/teams/${teamId}`, {
+                    method: 'PATCH',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify(updates)
+                });
+                return await response.json();
+            } catch (error) {
+                console.error('Error updating team:', error);
+                throw error;
+            }
+        }
+
+        // Function to delete a team
+        async function deleteTeam(teamId) {
+            try {
+                await fetch(`${API_URL}/teams/${teamId}`, {
+                    method: 'DELETE'
+                });
+            } catch (error) {
+                console.error('Error deleting team:', error);
+                throw error;
+            }
+        }
+
+        // Function to update the points table
+        async function updatePointsTable() {
+            const teams = await fetchTeams();
+            const tbody = document.getElementById('teamsTableBody');
+            tbody.innerHTML = '';
+
+            teams.forEach((team, index) => {
+                const tr = document.createElement('tr');
+                tr.innerHTML = `
+                    <td class="rank">${index + 1}</td>
+                    <td class="team-id">${String(team.teamId).padStart(3, '0')}</td>
+                    <td class="team-name">${team.teamName}</td>
+                    <td class="team-members">${team.members || 'N/A'}</td>
+                    <td class="round1-points">${team.round1Points || 0}</td>
+                    <td class="round2-points">${team.round2Points || 0}</td>
+                    <td class="total-points">${team.totalPoints}</td>
+                    <td class="actions">
+                        <button onclick="editTeam('${team._id}')" class="edit-btn">
+                            <i class="fas fa-edit"></i>
+                        </button>
+                        <button onclick="deleteTeamConfirm('${team._id}')" class="delete-btn">
+                            <i class="fas fa-trash"></i>
+                        </button>
+                    </td>
+                `;
+                tbody.appendChild(tr);
+            });
+
+            // Update statistics
+            document.getElementById('totalTeams').textContent = teams.length;
+            const totalPoints = teams.reduce((sum, team) => sum + team.totalPoints, 0);
+            document.getElementById('topScore').textContent = totalPoints;
+        }
+
+        // Function to handle form submission
+        document.getElementById('teamForm').addEventListener('submit', async function(e) {
+            e.preventDefault();
+            
+            const teamId = document.getElementById('teamId').value;
+            const teamName = document.getElementById('teamName').value;
+            const members = document.getElementById('teamMembers').value;
+            const round1Points = parseFloat(document.getElementById('round1Points').value) || 0;
+            const round2Points = parseFloat(document.getElementById('round2Points').value) || 0;
+            
+            const teamData = {
+                teamId,
+                teamNumber: teamName, // Using teamName as teamNumber for display
+                totalPoints: round1Points + round2Points,
+                members
+            };
+            
+            try {
+                await addTeam(teamData);
+                showToast('Team added successfully');
+                closeModal('teamModal');
+                await updatePointsTable();
+            } catch (error) {
+                console.error('Error adding team:', error);
+                showToast('Error adding team: ' + error.message);
+            }
+        });
+
+        // Initialize the dashboard
+        updatePointsTable();
+
         // Check if user is logged in
         function checkAuth() {
             const isLoggedIn = localStorage.getItem('adminLoggedIn') === 'true';
@@ -1252,43 +1378,6 @@
             // For now, we're just focusing on the teams section
             console.log(`Showing ${section} section`);
         }
-
-        // Handle team form submission
-        document.getElementById('teamForm').addEventListener('submit', function(e) {
-            e.preventDefault();
-            
-            const teamIndex = document.getElementById('teamIndex').value;
-            const teamId = document.getElementById('teamId').value;
-            const teamName = document.getElementById('teamName').value;
-            const members = document.getElementById('teamMembers').value;
-            const round1Points = document.getElementById('round1Points').value;
-            const round2Points = document.getElementById('round2Points').value;
-            
-            const teams = JSON.parse(localStorage.getItem('teams') || '[]');
-            
-            const teamData = {
-                teamId,
-                teamName,
-                members,
-                round1Points,
-                round2Points
-            };
-            
-            if (teamIndex === '') {
-                // Add new team
-                teams.push(teamData);
-                showToast('Team added successfully');
-            } else {
-                // Update existing team
-                teams[teamIndex] = teamData;
-                showToast('Team updated successfully');
-            }
-            
-            localStorage.setItem('teams', JSON.stringify(teams));
-            closeModal('teamModal');
-            loadTeams();
-            updateDashboardStats();
-        });
 
         // Handle Excel file import
         document.getElementById('excelFileInput').addEventListener('change', function(e) {
