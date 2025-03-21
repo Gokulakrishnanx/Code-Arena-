@@ -98,7 +98,7 @@
             color: #2196F3;
         }
 
-        .team-name {
+        .team-number {
             font-weight: 500;
             color: #ffffff;
         }
@@ -276,7 +276,7 @@
                     <tr>
                         <th class="rank">Rank</th>
                         <th>Team ID</th>
-                        <th>Team Name</th>
+                        <th>Team Number</th>
                         <th class="points">Total Points</th>
                     </tr>
                 </thead>
@@ -321,7 +321,7 @@
                 tr.innerHTML = `
                     <td class="rank">${team.rank}</td>
                     <td class="team-id">${String(team.teamId).padStart(3, '0')}</td>
-                    <td class="team-name">${team.teamName}</td>
+                    <td class="team-number">${team.teamName}</td>
                     <td class="points">${team.totalPoints}</td>
                 `;
                 tbody.appendChild(tr);
