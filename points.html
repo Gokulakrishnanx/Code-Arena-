@@ -253,6 +253,76 @@
                 padding: 0.8rem 1.5rem;
             }
         }
+
+        .round-links {
+            display: flex;
+            justify-content: center;
+            gap: 1.5rem;
+            margin-bottom: 3rem;
+            flex-wrap: wrap;
+            padding: 0 1rem;
+        }
+
+        .round-btn {
+            background: rgba(255, 255, 255, 0.1);
+            color: #ffffff;
+            padding: 1rem 2rem;
+            border-radius: 12px;
+            text-decoration: none;
+            font-size: 1.1rem;
+            transition: all 0.3s ease;
+            backdrop-filter: blur(10px);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            display: flex;
+            align-items: center;
+            gap: 0.8rem;
+            min-width: 200px;
+            justify-content: center;
+        }
+
+        .round-btn:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.3);
+        }
+
+        .round-btn i {
+            font-size: 1.3rem;
+        }
+
+        .c-btn {
+            background: linear-gradient(135deg, #2196F3, #1976D2);
+        }
+
+        .c-btn:hover {
+            background: linear-gradient(135deg, #1976D2, #2196F3);
+        }
+
+        .java-btn {
+            background: linear-gradient(135deg, #F44336, #D32F2F);
+        }
+
+        .java-btn:hover {
+            background: linear-gradient(135deg, #D32F2F, #F44336);
+        }
+
+        .python-btn {
+            background: linear-gradient(135deg, #4CAF50, #388E3C);
+        }
+
+        .python-btn:hover {
+            background: linear-gradient(135deg, #388E3C, #4CAF50);
+        }
+
+        @media (max-width: 768px) {
+            .round-links {
+                flex-direction: column;
+                gap: 1rem;
+            }
+
+            .round-btn {
+                width: 100%;
+            }
+        }
     </style>
 </head>
 <body>
@@ -264,6 +334,24 @@
     </nav>
 
     <main class="page-content">
+        <section class="section">
+            <h2 class="section-title">Round 1 Links</h2>
+            <div class="round-links">
+                <a href="https://forms.gle/AAhdrRBHNx3dC9udA" target="_blank" class="round-btn c-btn">
+                    <i class="fas fa-code"></i>
+                    Round 1 - C
+                </a>
+                <a href="https://forms.gle/BscT5vnpeFKpaGgs9" target="_blank" class="round-btn java-btn">
+                    <i class="fab fa-java"></i>
+                    Round 1 - Java
+                </a>
+                <a href="https://forms.gle/RKAcYk1A5e1h9wTw5" target="_blank" class="round-btn python-btn">
+                    <i class="fab fa-python"></i>
+                    Round 1 - Python
+                </a>
+            </div>
+        </section>
+
         <section class="section">
             <h2 class="section-title">Live Points Table</h2>
             <div class="refresh-container">
@@ -292,56 +380,63 @@
     <a href="index.html" class="back-btn">Back to Home</a>
 
     <script>
-        // API Base URL - Change this to your deployed backend URL
-        const API_URL = 'http://localhost:5000/api';
+        const API_URL = 'http://localhost:5001/api/teams';
 
-        // Function to fetch teams data
+        // Function to fetch teams from the API
         async function fetchTeams() {
             try {
-                const response = await fetch(`${API_URL}/teams`);
-                const teams = await response.json();
-                return teams;
+                const response = await fetch(API_URL);
+                if (!response.ok) {
+                    throw new Error('Failed to fetch teams');
+                }
+                return await response.json();
             } catch (error) {
                 console.error('Error fetching teams:', error);
-                return [];
+                throw error;
             }
         }
 
         // Function to update the points table
         async function updatePointsTable() {
             const tbody = document.getElementById('pointsTableBody');
-            tbody.innerHTML = ''; // Clear existing rows
-
+            const refreshBtn = document.querySelector('.refresh-btn i');
+            
             try {
-                const teams = await fetchTeams();
+                refreshBtn.classList.add('fa-spin');
+                const response = await fetch(API_URL);
+                if (!response.ok) {
+                    throw new Error('Failed to fetch teams');
+                }
+                const teams = await response.json();
+                tbody.innerHTML = ''; // Clear existing rows
 
-                if (teams.length === 0) {
-                    const tr = document.createElement('tr');
-                    tr.innerHTML = `<td colspan="4" class="no-data">No teams data available</td>`;
-                    tbody.appendChild(tr);
+                if (!teams || teams.length === 0) {
+                    tbody.innerHTML = `<tr><td colspan="4" class="no-data">No teams data available</td></tr>`;
                     return;
                 }
 
                 // Sort teams by total points in descending order
-                teams.sort((a, b) => b.totalPoints - a.totalPoints);
+                teams.sort((a, b) => {
+                    const totalA = (parseFloat(a.round1Points) || 0) + (parseFloat(a.round2Points) || 0);
+                    const totalB = (parseFloat(b.round1Points) || 0) + (parseFloat(b.round2Points) || 0);
+                    return totalB - totalA;
+                });
 
                 teams.forEach((team, index) => {
                     const tr = document.createElement('tr');
-                    
-                    // Add class for top 3 teams
-                    if (index === 0) {
-                        tr.classList.add('first-place');
-                    } else if (index === 1) {
-                        tr.classList.add('second-place');
-                    } else if (index === 2) {
-                        tr.classList.add('third-place');
-                    }
-                    
+                    if (index === 0) tr.classList.add('first-place');
+                    if (index === 1) tr.classList.add('second-place');
+                    if (index === 2) tr.classList.add('third-place');
+
+                    const round1 = parseFloat(team.round1Points) || 0;
+                    const round2 = parseFloat(team.round2Points) || 0;
+                    const totalPoints = round1 + round2;
+
                     tr.innerHTML = `
                         <td class="rank">${index + 1}</td>
                         <td class="team-id">${String(team.teamId).padStart(3, '0')}</td>
-                        <td class="team-number">${team.teamNumber || 'N/A'}</td>
-                        <td class="points">${team.totalPoints || 0}</td>
+                        <td class="team-number">${team.teamName || 'N/A'}</td>
+                        <td class="points">${totalPoints}</td>
                     `;
                     tbody.appendChild(tr);
                 });
@@ -353,24 +448,30 @@
             } catch (error) {
                 console.error('Error updating points table:', error);
                 tbody.innerHTML = `<tr><td colspan="4" class="no-data">Error loading teams data. Please try again.</td></tr>`;
+            } finally {
+                refreshBtn.classList.remove('fa-spin');
             }
         }
 
-        // Function to refresh the points table
-        function refreshPointsTable() {
+        // Function to handle refresh button click
+        async function refreshPointsTable() {
             const refreshBtn = document.querySelector('.refresh-btn');
-            refreshBtn.classList.add('refreshing');
-            
-            updatePointsTable().then(() => {
-                refreshBtn.classList.remove('refreshing');
-            });
+            refreshBtn.disabled = true;
+            await updatePointsTable();
+            refreshBtn.disabled = false;
         }
 
-        // Initial load
-        updatePointsTable();
-
-        // Refresh every 60 seconds
-        setInterval(refreshPointsTable, 60000);
+        // Initial load and auto-refresh setup
+        document.addEventListener('DOMContentLoaded', () => {
+            // Initial load
+            updatePointsTable();
+            
+            // Set up auto-refresh every 5 seconds
+            setInterval(updatePointsTable, 5000);
+            
+            // Add click handler for manual refresh
+            document.querySelector('.refresh-btn').addEventListener('click', refreshPointsTable);
+        });
 
         // Add animation delay to sections
         document.querySelectorAll('.section').forEach((section, index) => {

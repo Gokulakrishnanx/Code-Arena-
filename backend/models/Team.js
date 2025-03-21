@@ -6,32 +6,40 @@ const teamSchema = new mongoose.Schema({
         required: true,
         unique: true
     },
-    teamNumber: {
+    teamName: {
         type: String,
         required: true
     },
-    totalPoints: {
+    members: {
+        type: String,
+        default: ''
+    },
+    round1Points: {
         type: Number,
         default: 0
     },
-    rank: {
-        type: Number
-    },
-    lastUpdated: {
-        type: Date,
-        default: Date.now
+    round2Points: {
+        type: Number,
+        default: 0
     }
+}, {
+    timestamps: true
 });
 
-// Update rank before saving
-teamSchema.pre('save', async function(next) {
-    if (this.isModified('totalPoints')) {
-        const Team = this.constructor;
-        const teams = await Team.find({}).sort({ totalPoints: -1 });
-        const index = teams.findIndex(team => team._id.equals(this._id));
-        this.rank = index + 1;
+// Virtual for total points
+teamSchema.virtual('totalPoints').get(function() {
+    return (this.round1Points || 0) + (this.round2Points || 0);
+});
+
+// Ensure virtuals are included in JSON
+teamSchema.set('toJSON', {
+    virtuals: true,
+    transform: function(doc, ret) {
+        ret.id = ret._id;
+        delete ret._id;
+        delete ret.__v;
+        return ret;
     }
-    next();
 });
 
 module.exports = mongoose.model('Team', teamSchema); 

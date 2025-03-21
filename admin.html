@@ -1066,30 +1066,37 @@
     
     <script>
         // API Base URL - Change this to your deployed backend URL
-        const API_URL = 'http://localhost:5000/api';
+        const API_URL = 'http://localhost:5001/api/teams';
 
-        // Function to fetch all teams
+        // Function to fetch teams from the API
         async function fetchTeams() {
             try {
-                const response = await fetch(`${API_URL}/teams`);
-                const teams = await response.json();
-                return teams;
+                const response = await fetch(API_URL);
+                if (!response.ok) {
+                    throw new Error('Failed to fetch teams');
+                }
+                return await response.json();
             } catch (error) {
                 console.error('Error fetching teams:', error);
-                return [];
+                throw error;
             }
         }
 
         // Function to add a new team
         async function addTeam(teamData) {
             try {
-                const response = await fetch(`${API_URL}/teams`, {
+                const response = await fetch(API_URL, {
                     method: 'POST',
                     headers: {
                         'Content-Type': 'application/json',
                     },
                     body: JSON.stringify(teamData)
                 });
+
+                if (!response.ok) {
+                    throw new Error('Failed to add team');
+                }
+
                 return await response.json();
             } catch (error) {
                 console.error('Error adding team:', error);
@@ -1100,13 +1107,18 @@
         // Function to update team points
         async function updateTeam(teamId, updates) {
             try {
-                const response = await fetch(`${API_URL}/teams/${teamId}`, {
+                const response = await fetch(`${API_URL}/${teamId}`, {
                     method: 'PATCH',
                     headers: {
                         'Content-Type': 'application/json',
                     },
                     body: JSON.stringify(updates)
                 });
+
+                if (!response.ok) {
+                    throw new Error('Failed to update team');
+                }
+
                 return await response.json();
             } catch (error) {
                 console.error('Error updating team:', error);
@@ -1117,9 +1129,15 @@
         // Function to delete a team
         async function deleteTeam(teamId) {
             try {
-                await fetch(`${API_URL}/teams/${teamId}`, {
+                const response = await fetch(`${API_URL}/${teamId}`, {
                     method: 'DELETE'
                 });
+
+                if (!response.ok) {
+                    throw new Error('Failed to delete team');
+                }
+
+                return true;
             } catch (error) {
                 console.error('Error deleting team:', error);
                 throw error;
@@ -1128,39 +1146,73 @@
 
         // Function to update the points table
         async function updatePointsTable() {
-            const teams = await fetchTeams();
             const tbody = document.getElementById('teamsTableBody');
-            tbody.innerHTML = '';
+            tbody.innerHTML = ''; // Clear existing rows
 
-            teams.forEach((team, index) => {
-                const tr = document.createElement('tr');
-                tr.innerHTML = `
-                    <td class="rank">${index + 1}</td>
-                    <td class="team-id">${String(team.teamId).padStart(3, '0')}</td>
-                    <td class="team-name">${team.teamName}</td>
-                    <td class="team-members">${team.members || 'N/A'}</td>
-                    <td class="round1-points">${team.round1Points || 0}</td>
-                    <td class="round2-points">${team.round2Points || 0}</td>
-                    <td class="total-points">${team.totalPoints}</td>
-                    <td class="actions">
-                        <button onclick="editTeam('${team._id}')" class="edit-btn">
-                            <i class="fas fa-edit"></i>
-                        </button>
-                        <button onclick="deleteTeamConfirm('${team._id}')" class="delete-btn">
-                            <i class="fas fa-trash"></i>
-                        </button>
-                    </td>
-                `;
-                tbody.appendChild(tr);
-            });
+            try {
+                const response = await fetch(API_URL);
+                if (!response.ok) {
+                    throw new Error('Failed to fetch teams');
+                }
+                const teams = await response.json();
 
-            // Update statistics
-            document.getElementById('totalTeams').textContent = teams.length;
-            const totalPoints = teams.reduce((sum, team) => sum + team.totalPoints, 0);
-            document.getElementById('topScore').textContent = totalPoints;
+                if (!teams || teams.length === 0) {
+                    tbody.innerHTML = `<tr><td colspan="8" class="no-data">No teams data available</td></tr>`;
+                    return;
+                }
+
+                // Sort teams by total points in descending order
+                teams.sort((a, b) => {
+                    const totalA = (parseFloat(a.round1Points) || 0) + (parseFloat(a.round2Points) || 0);
+                    const totalB = (parseFloat(b.round1Points) || 0) + (parseFloat(b.round2Points) || 0);
+                    return totalB - totalA;
+                });
+
+                teams.forEach((team, index) => {
+                    const tr = document.createElement('tr');
+                    if (index === 0) tr.classList.add('first-place');
+                    if (index === 1) tr.classList.add('second-place');
+                    if (index === 2) tr.classList.add('third-place');
+
+                    const round1 = parseFloat(team.round1Points) || 0;
+                    const round2 = parseFloat(team.round2Points) || 0;
+                    const totalPoints = round1 + round2;
+
+                    tr.innerHTML = `
+                        <td>${index + 1}</td>
+                        <td>${team.teamId}</td>
+                        <td>${team.teamName}</td>
+                        <td>${team.members || 'N/A'}</td>
+                        <td>${round1}</td>
+                        <td>${round2}</td>
+                        <td>${totalPoints}</td>
+                        <td class="team-actions">
+                            <button onclick="editTeam('${team._id}')" class="edit-btn">
+                                <i class="fas fa-edit"></i>
+                            </button>
+                            <button onclick="deleteTeamConfirm('${team._id}')" class="delete-btn">
+                                <i class="fas fa-trash"></i>
+                            </button>
+                        </td>
+                    `;
+                    tbody.appendChild(tr);
+                });
+
+                // Update statistics
+                document.getElementById('totalTeams').textContent = teams.length;
+                const topScore = Math.max(...teams.map(team => 
+                    (parseFloat(team.round1Points) || 0) + (parseFloat(team.round2Points) || 0)
+                ));
+                document.getElementById('topScore').textContent = topScore;
+
+                showToast('Points table updated successfully');
+            } catch (error) {
+                console.error('Error updating points table:', error);
+                showToast('Error updating points table: ' + error.message);
+            }
         }
 
-        // Function to handle form submission
+        // Handle team form submission
         document.getElementById('teamForm').addEventListener('submit', async function(e) {
             e.preventDefault();
             
@@ -1171,25 +1223,106 @@
             const round2Points = parseFloat(document.getElementById('round2Points').value) || 0;
             
             const teamData = {
-                teamId,
-                teamNumber: teamName, // Using teamName as teamNumber for display
-                totalPoints: round1Points + round2Points,
-                members
+                teamId: teamId,
+                teamName: teamName,
+                members: members,
+                round1Points: round1Points,
+                round2Points: round2Points,
+                totalPoints: round1Points + round2Points
             };
             
             try {
-                await addTeam(teamData);
-                showToast('Team added successfully');
+                // First, check if the team already exists
+                const existingTeams = await fetchTeams();
+                const existingTeam = existingTeams.find(t => t.teamId === teamId);
+                
+                let response;
+                if (existingTeam) {
+                    // Update existing team
+                    response = await fetch(`${API_URL}/${existingTeam._id}`, {
+                        method: 'PATCH',
+                        headers: {
+                            'Content-Type': 'application/json',
+                        },
+                        body: JSON.stringify(teamData)
+                    });
+                } else {
+                    // Add new team
+                    response = await fetch(API_URL, {
+                        method: 'POST',
+                        headers: {
+                            'Content-Type': 'application/json',
+                        },
+                        body: JSON.stringify(teamData)
+                    });
+                }
+
+                if (!response.ok) {
+                    const errorData = await response.json().catch(() => ({}));
+                    throw new Error(errorData.message || 'Failed to save team');
+                }
+
+                await response.json();
+                showToast(existingTeam ? 'Team updated successfully' : 'Team added successfully');
                 closeModal('teamModal');
+                document.getElementById('teamForm').reset();
                 await updatePointsTable();
             } catch (error) {
-                console.error('Error adding team:', error);
-                showToast('Error adding team: ' + error.message);
+                console.error('Error saving team:', error);
+                showToast('Error saving team: ' + error.message);
             }
         });
 
-        // Initialize the dashboard
-        updatePointsTable();
+        // Function to edit team
+        async function editTeam(teamId) {
+            try {
+                const teams = await fetchTeams();
+                const team = teams.find(t => t._id === teamId);
+                if (!team) {
+                    throw new Error('Team not found');
+                }
+
+                // Fill the form with team data
+                document.getElementById('teamId').value = team.teamId;
+                document.getElementById('teamName').value = team.teamName;
+                document.getElementById('teamMembers').value = team.members || '';
+                document.getElementById('round1Points').value = team.round1Points || 0;
+                document.getElementById('round2Points').value = team.round2Points || 0;
+
+                // Open the modal
+                document.getElementById('modalTitle').textContent = 'Edit Team';
+                openModal('teamModal');
+            } catch (error) {
+                console.error('Error editing team:', error);
+                showToast('Error editing team: ' + error.message);
+            }
+        }
+
+        // Function to delete team
+        async function deleteTeamConfirm(teamId) {
+            if (confirm('Are you sure you want to delete this team?')) {
+                try {
+                    const response = await fetch(`${API_URL}/${teamId}`, {
+                        method: 'DELETE'
+                    });
+
+                    if (!response.ok) {
+                        throw new Error('Failed to delete team');
+                    }
+
+                    showToast('Team deleted successfully');
+                    await updatePointsTable();
+                } catch (error) {
+                    console.error('Error deleting team:', error);
+                    showToast('Error deleting team: ' + error.message);
+                }
+            }
+        }
+
+        // Initial load
+        document.addEventListener('DOMContentLoaded', () => {
+            updatePointsTable();
+        });
 
         // Check if user is logged in
         function checkAuth() {
@@ -1250,126 +1383,6 @@
             document.getElementById('teamForm').reset();
             document.getElementById('teamIndex').value = '';
             openModal('teamModal');
-        }
-
-        // Open edit team modal
-        function openEditTeamModal(index) {
-            const teams = JSON.parse(localStorage.getItem('teams') || '[]');
-            const team = teams[index];
-            
-            document.getElementById('modalTitle').textContent = 'Edit Team';
-            document.getElementById('teamIndex').value = index;
-            document.getElementById('teamId').value = team.teamId;
-            document.getElementById('teamName').value = team.teamName;
-            document.getElementById('teamMembers').value = team.members;
-            document.getElementById('round1Points').value = team.round1Points;
-            document.getElementById('round2Points').value = team.round2Points;
-            
-            openModal('teamModal');
-        }
-
-        // Delete team
-        function deleteTeam(index) {
-            if (confirm('Are you sure you want to delete this team?')) {
-                const teams = JSON.parse(localStorage.getItem('teams') || '[]');
-                teams.splice(index, 1);
-                localStorage.setItem('teams', JSON.stringify(teams));
-                loadTeams();
-                updateDashboardStats();
-                showToast('Team deleted successfully');
-            }
-        }
-
-        // Function to show loading overlay
-        function showTeamsLoading() {
-            document.getElementById('teamsLoadingOverlay').classList.add('show');
-        }
-        
-        // Function to hide loading overlay
-        function hideTeamsLoading() {
-            document.getElementById('teamsLoadingOverlay').classList.remove('show');
-        }
-
-        // Load teams
-        function loadTeams() {
-            const teams = JSON.parse(localStorage.getItem('teams') || '[]');
-            const tableBody = document.getElementById('teamsTableBody');
-            
-            tableBody.innerHTML = '';
-            
-            // Sort teams by total points in descending order
-            const sortedTeams = [...teams].sort((a, b) => {
-                const totalA = (parseFloat(a.round1Points) || 0) + (parseFloat(a.round2Points) || 0);
-                const totalB = (parseFloat(b.round1Points) || 0) + (parseFloat(b.round2Points) || 0);
-                return totalB - totalA;
-            });
-            
-            sortedTeams.forEach((team, index) => {
-                const totalPoints = (parseFloat(team.round1Points) || 0) + (parseFloat(team.round2Points) || 0);
-                
-                const row = document.createElement('tr');
-                row.innerHTML = `
-                    <td>${index + 1}</td>
-                    <td>${team.teamId}</td>
-                    <td>${team.teamName}</td>
-                    <td>${team.members || 'N/A'}</td>
-                    <td>${team.round1Points || 0}</td>
-                    <td>${team.round2Points || 0}</td>
-                    <td>${totalPoints}</td>
-                    <td class="team-actions">
-                        <button class="action-btn edit" onclick="openEditTeamModal(${teams.indexOf(team)})">
-                            <i class="fas fa-edit"></i>
-                        </button>
-                        <button class="action-btn delete" onclick="deleteTeam(${teams.indexOf(team)})">
-                            <i class="fas fa-trash"></i>
-                        </button>
-                    </td>
-                `;
-                
-                // Add class for top 3 teams
-                if (index === 0) {
-                    row.classList.add('first-place');
-                } else if (index === 1) {
-                    row.classList.add('second-place');
-                } else if (index === 2) {
-                    row.classList.add('third-place');
-                }
-                
-                tableBody.appendChild(row);
-            });
-            
-            // Update the points table data in localStorage for the main page to use
-            const pointsTableData = sortedTeams.map((team, index) => {
-                return {
-                    teamId: team.teamId,
-                    teamName: team.teamName,
-                    round1Points: parseFloat(team.round1Points) || 0,
-                    round2Points: parseFloat(team.round2Points) || 0,
-                    totalPoints: (parseFloat(team.round1Points) || 0) + (parseFloat(team.round2Points) || 0),
-                    rank: index + 1
-                };
-            });
-            
-            localStorage.setItem('pointsTableData', JSON.stringify(pointsTableData));
-        }
-
-        // Update dashboard statistics
-        function updateDashboardStats() {
-            const teams = JSON.parse(localStorage.getItem('teams') || '[]');
-            
-            // Update total teams
-            document.getElementById('totalTeams').textContent = teams.length;
-            
-            // Update top score
-            let topScore = 0;
-            teams.forEach(team => {
-                const totalPoints = (parseFloat(team.round1Points) || 0) + (parseFloat(team.round2Points) || 0);
-                if (totalPoints > topScore) {
-                    topScore = totalPoints;
-                }
-            });
-            
-            document.getElementById('topScore').textContent = topScore;
         }
 
         // Show section
